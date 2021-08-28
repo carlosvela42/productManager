@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Create New Product</title>
+<link href="css/product.css" rel="stylesheet" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 col-xl-9 mx-auto">
+        <div class="card card-signin flex-row my-5">
+          <div class="card-img-left d-none d-md-flex">
+             <!-- Background image for card set in CSS! -->
+          </div>
+          <div class="card-body">
+            <h5 class="card-title text-center">Thông tin đơn hàng</h5>
+            <form class="form-signin" action="#" th:action="@{/save}" th:object="${product}"
+			method="post">
+              <div class="form-label-group">
+              
+                <input type="text" id="inputEmail" class="form-control" placeholder="Email" required autofocus th:field="*{email}">
+                <label for="inputEmail">Email</label>
+              </div>
+
+              <div class="form-label-group">
+                <input type="text" id="inputPhone" class="form-control" placeholder="Phone" required th:field="*{phone}">
+                <label for="inputPhone">Số điện thoại</label>
+              </div>
+              
+              <hr>
+
+              <div class="form-label-group">
+                
+                <select id="inputPackage" name="inputPackage" class="form-control" required th:field="*{packageId}">
+												<option value="" selected>Chọn gói</option>
+												<option value="1">Gói 1 tháng - 10k</option>
+												<option value="2">Gói 2 tháng - 20k</option>
+												<option value="3">Gói 3 tháng - 30k</option>
+												
+											</select>
+                
+              </div>
+              
+              <div class="form-label-group">
+                <input type="text" id="inputCode" class="form-control" placeholder="Code" th:field="*{code}">
+                <label for="inputCode">Code giảm giá</label>
+              </div>
+
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Mua hàng</button>
+              
+              <hr class="my-4">
+             
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

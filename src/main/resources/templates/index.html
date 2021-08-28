@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link href="css/main.css" rel="stylesheet" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var product = /*[[${product}]]*/ 'default';
+    
+
+/*]]>*/
+</script>
+<script type="text/javascript">
+$(document).ready(function(){	
+	
+	 $('.v10_4').click(function(){
+
+		 var dataTime =  ($(this).attr("data-type") == '1' || $(this).attr("data-type") == '2') ? "" : "định kỳ " + $(this).attr("data-time") + ' ngày';
+		 $('.v23_22').html('<span class="weight">GÓI ' + $(this).attr("data-name") + '</span><br/>Số tiền thanh toán ' + dataTime + '<br/><span class="v23_29"></span>');
+		 price = $(this).attr("data-price");
+		 $('.v23_29').html(parseInt(price).toLocaleString() + 'VNĐ');
+		 $('.v23_34').html(parseInt(price).toLocaleString() + 'VNĐ');
+		 $('.v23_34').hide();
+		 $('.v23_30').html(parseInt(price).toLocaleString() + 'VNĐ');
+		 $('#price').val(price);
+		 $('#packageId').val($(this).attr("data-id"));
+	 });
+	 var price = '';
+	 $('.v23_31, .v23_32').click(function(){
+		 for (var i in listCd) {
+			 if( listCd[i].name == $('.v23_16').val()) {
+				 $('.v23_34').show();
+				 var prices = price * (100 - listCd[i].price) / 100;
+				 $('#price').val(prices);
+				 $('.v23_30').html(parseInt(prices).toLocaleString() + 'VNĐ');
+				}
+			}
+		 
+	 });
+	 $('#myform').submit(function() {
+		 for (var i in listCd) {
+			 if( listCd[i].name == $('.v23_16').val()) {
+				 $('.v23_34').show();
+				 var prices = price * (100 - listCd[i].price) / 100;
+				 $('#price').val(prices);
+				 $('.v23_30').html(parseInt(prices).toLocaleString() + 'VNĐ');
+				}
+			}
+		 return true;
+	 });
+	 
+	 if(product.errorMsg == '1'){
+			alert("Thanh toán không thành công, email của bạn đã từng mua gói này!");
+		} else if(product.errorMsg == '0'){
+			alert("Orderflow VN xin cảm ơn quý khách, chúng tôi đã gửi hướng dẫn cài đặt đến Email đã đăng ký. Quý khách vui lòng kiểm tra Email");
+		}
+	});
+</script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var listCd = /*[[${listCode}]]*/ 'default';
+    
+
+/*]]>*/
+</script>
+<title>Product Manager</title>
+</head>
+<body>
+<div class="v10_3">
+<span th:each="packages,iter : ${listPackages}">
+
+<span class="v10_131" th:text="${packages.key}"></span>
+<div class="v10_31">
+
+<span th:each="package : ${packages.value}">
+<div class="v10_4" data-toggle="modal" data-target="#exampleModal" th:data-name="${packages.key}" th:data-time="${package.time}" th:data-price="${package.price}" th:data-id="${package.id}" th:data-type="${package.type}">
+
+<span class="v10_32" th:switch="${package.type}">
+	<p th:case="'1'">Dùng thử</p>
+	<p th:case="*" th:text="${package.priceLocale} + 'đ'"></p>
+</span>
+<span class="v10_161" th:switch="${package.type}">	
+	<p th:case="'2'">/ Vĩnh viễn</p>
+	<p th:case="*" th:text="'/ ' + ${package.time} + ' ngày'"></p>
+</span>
+<span class="v10_251" th:switch="${package.type}">
+	<p th:case="'1'">(Dùng thử miễn phí 14 ngày)</p>
+	<p th:case="'2'">(Thanh toán vĩnh viễn)</p>
+	<p th:case="*" th:text="'(Thanh toán định kỳ ' + ${package.time} + ' ngày)'"></p>
+</span>
+
+</div>
+</span>
+</div>
+<hr class="v10_33"/>
+</span>
+
+<div class="name"></div>
+<div class="name"></div>
+<div class="name"></div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <form  id="myform" class="form-signin" action="#" th:action="@{/save}" th:object="${product}"
+			method="post">
+      <div class="v23_13"></div><span class="v23_59">Thông tin cơ bản</span><span class="v23_60">Orderflow VN sẽ gửi thông tin xác nhận đơn hàng và cách kích hoạt tài khoản vào Email của bạn sau khi hoàn tất quá trình thanh toán.
+      <span class="red">(* Bắt buộc nhập)</span>
+      </span>
+<input type="hidden" id="packageId" th:field="*{packageId}"></input>
+<input type="hidden" id="price" th:field="*{price}"></input>
+<input class="v23_14" placeholder="EMAIL*" th:field="*{email}" th:required="required"></input>
+<input class="v23_15" placeholder="SỐ ĐIỆN THOẠI*" th:field="*{phone}" th:required="required"></input><button type="submit" class="v23_17">THANH TOÁN</button><span class="v23_20">Đơn hàng</span>
+<span class="v23_22"></span><span class="v23_23">SỐ TIỀN THANH TOÁN LẦN ĐẦU</span>
+<input class="v23_16" placeholder="MÃ GIỚI THIỆU" th:field="*{code}"></input><div class="name"></div><div class="name"></div>
+<span class="v23_30"></span><del class="v23_34"></del><div class="v23_31"></div><div class="v23_32"></div>
+    </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

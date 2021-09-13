@@ -218,7 +218,7 @@ public class ProductService {
 	}
 	
 	public void insertMap(Product product) {
-		String sql = "INSERT INTO MAP (USER_ID,PACKAGE_ID,IS_CANCEL,PAY_DATE,TOTAL_AMOUNT,CODE) SELECT (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1), ?, 'N', ?, ?,? FROM dual";
+		String sql = "INSERT INTO MAP (USER_ID,PACKAGE_ID,IS_CANCEL,PAY_DATE,TOTAL_AMOUNT,CODE,MACHINE_ID) SELECT (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1), ?, 'N', ?, ?,?,? FROM dual";
 		Connection con = null;
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
@@ -232,7 +232,7 @@ public class ProductService {
 			pstm.setDate  (3, new java.sql.Date(date.getTime()));			
 			pstm.setString(4, product.getPrice());
 			pstm.setString(5, product.getCode());
-			
+			pstm.setString(6, product.getMachineId());
 			int updateCount = pstm.executeUpdate();	
 			System.out.print(updateCount);
 		} catch (Exception e) {

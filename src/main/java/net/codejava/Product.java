@@ -28,6 +28,8 @@ public class Product {
 	private String price;
 	
 	private String errorMsg;
+	
+	private String machineId;
 
 	protected Product() {
 	}
@@ -139,6 +141,18 @@ public class Product {
 
 	public void setErrorMsg(String errorMsg) {
 		this.errorMsg = errorMsg;
+	}
+
+
+
+	public String getMachineId() {
+		return machineId;
+	}
+
+
+
+	public void setMachineId(String machineId) {
+		this.machineId = machineId;
 	}
 
 	

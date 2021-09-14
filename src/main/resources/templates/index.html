@@ -29,6 +29,12 @@ $(document).ready(function(){
 		 $('.v23_29').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('.v23_34').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('.v23_34').hide();
+		 if($(this).attr("data-type") == '1'){
+			 $('.v23_18').hide();
+			 $('.v23_61').hide();
+			 
+		 } 
+		 
 		 $('.v23_30').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('#price').val(price);
 		 $('#packageId').val($(this).attr("data-id"));
@@ -122,7 +128,8 @@ $(document).ready(function(){
 <input class="v23_14" placeholder="EMAIL*" th:field="*{email}" th:required="required"></input>
 <input class="v23_15" placeholder="SỐ ĐIỆN THOẠI*" th:field="*{phone}" th:required="required"></input>
 <input class="v23_18" placeholder="MACHINE ID" th:field="*{machineId}"></input>
-<span class="v23_61 red">Cách lấy Machine ID xem tại đây: <span class="blue">link</span></span>
+	<span class="v23_61 red">Cách lấy Machine ID xem tại đây: <span class="blue">link</span></span>
+
 <button type="submit" class="v23_17">THANH TOÁN</button><span class="v23_20">Đơn hàng</span>
 <span class="v23_22"></span><span class="v23_23">SỐ TIỀN THANH TOÁN LẦN ĐẦU</span>
 <input class="v23_16" placeholder="MÃ GIỚI THIỆU" th:field="*{code}"></input><div class="name"></div><div class="name"></div>

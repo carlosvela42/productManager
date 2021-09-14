@@ -33,7 +33,10 @@ $(document).ready(function(){
 			 $('.v23_18').hide();
 			 $('.v23_61').hide();
 			 
-		 } 
+		 } else{
+			 $('.v23_18').show();
+			 $('.v23_61').show();
+		 }
 		 
 		 $('.v23_30').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('#price').val(price);

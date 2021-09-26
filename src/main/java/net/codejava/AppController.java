@@ -68,6 +68,7 @@ public class AppController {
 		product.setInvoiceNo("EPAY000001" + fullDate);
 		
 		service.insertUser(product);
+		product.setStatus("0");
 		//if(service.checkExist(product)) {
 		if(false) {
 			product.setErrorMsg("1");
@@ -96,7 +97,8 @@ public class AppController {
 			service.updateUseCountCode(product.getCode());
 			//if("0".equals(product.getPrice())) {		    	
 		    if(true) {	
-				product.setErrorMsg("0");
+				product.setErrorMsg("0");				
+				service.insertPayment(product);
 				List<Packages> listPackages = service.listAllPackages();
 				
 				LinkedHashMap<String, List<Packages>> hashMap = new LinkedHashMap<String, List<Packages>>();

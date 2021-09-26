@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -218,7 +219,7 @@ public class ProductService {
 	}
 	
 	public void insertMap(Product product) {
-		String sql = "INSERT INTO MAP (USER_ID,PACKAGE_ID,IS_CANCEL,PAY_DATE,TOTAL_AMOUNT,CODE,MACHINE_ID) SELECT (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1), ?, 'N', ?, ?,?,? FROM dual";
+		String sql = "INSERT INTO MAP (USER_ID,PACKAGE_ID,IS_CANCEL,PAY_DATE,NEXT_PAY_DATE,TOTAL_AMOUNT,CODE,MACHINE_ID) SELECT (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1), ?, 'N', ?,? ,?,?,? FROM dual";
 		Connection con = null;
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
@@ -229,10 +230,23 @@ public class ProductService {
 			pstm.setString(1, product.getEmail());
 			pstm.setString(2, product.getPackageId());
 			Date date = new Date();
-			pstm.setDate  (3, new java.sql.Date(date.getTime()));			
-			pstm.setString(4, product.getPrice());
-			pstm.setString(5, product.getCode());
-			pstm.setString(6, product.getMachineId());
+			Calendar c = Calendar.getInstance(); 
+			c.setTime(date); 
+			try{
+	            int number = Integer.parseInt(product.getTime());
+	            System.out.println(number); 
+	            c.add(Calendar.DATE, number);
+	        }
+	        catch (NumberFormatException ex){
+	            ex.printStackTrace();
+	        }
+			
+			Date dt = c.getTime();
+			pstm.setDate  (3, new java.sql.Date(date.getTime()));
+			pstm.setDate  (4, new java.sql.Date(dt.getTime()));
+			pstm.setString(5, product.getPrice());
+			pstm.setString(6, product.getCode());
+			pstm.setString(7, product.getMachineId());
 			int updateCount = pstm.executeUpdate();	
 			System.out.print(updateCount);
 		} catch (Exception e) {
@@ -243,7 +257,7 @@ public class ProductService {
 	}
 	
 	public void insertPayment(Product product) {
-		String sql = "INSERT INTO PAYMENT (MAP_ID,PRICE,EPAY_DATE,INVOICE_NO) SELECT (SELECT ID FROM MAP WHERE USER_ID = (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1) AND PACKAGE_ID = ? AND IS_CANCEL = 'N' AND ROWNUM = 1), ?, ?, ? FROM dual";
+		String sql = "INSERT INTO PAYMENT (MAP_ID,PRICE,EPAY_DATE,INVOICE_NO,STATUS) SELECT (SELECT ID FROM MAP WHERE USER_ID = (SELECT ID FROM USERS WHERE EMAIL = ? LIMIT 1) AND PACKAGE_ID = ? AND IS_CANCEL = 'N' LIMIT 1), ?, ?, ?,? FROM dual";
 		Connection con = null;
 		PreparedStatement pstm = null;
 		ResultSet rs = null;
@@ -257,8 +271,9 @@ public class ProductService {
 			pstm.setString(3, product.getPrice());
 			Date date = new Date();
 			pstm.setDate  (4, new java.sql.Date(date.getTime()));			
-			pstm.setString(5, product.getInvoiceNo());
 			
+			pstm.setString(5, product.getInvoiceNo());
+			pstm.setString(6, product.getStatus());
 			int updateCount = pstm.executeUpdate();	
 			System.out.print(updateCount);
 		} catch (Exception e) {

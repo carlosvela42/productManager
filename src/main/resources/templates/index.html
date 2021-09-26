@@ -26,6 +26,7 @@ $(document).ready(function(){
 		 var dataTime =  ($(this).attr("data-type") == '1' || $(this).attr("data-type") == '2') ? "" : "định kỳ " + $(this).attr("data-time") + ' ngày';
 		 $('.v23_22').html('<span class="weight">GÓI ' + $(this).attr("data-name") + '</span><br/>Số tiền thanh toán ' + dataTime + '<br/><span class="v23_29"></span>');
 		 price = $(this).attr("data-price");
+		 time = $(this).attr("data-time");
 		 $('.v23_29').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('.v23_34').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('.v23_34').hide();
@@ -40,9 +41,11 @@ $(document).ready(function(){
 		 
 		 $('.v23_30').html(parseInt(price).toLocaleString() + 'VNĐ');
 		 $('#price').val(price);
+		 $('#time').val(time);
 		 $('#packageId').val($(this).attr("data-id"));
 	 });
 	 var price = '';
+	 var time = '';
 	 $('.v23_31, .v23_32').click(function(){
 		 for (var i in listCd) {
 			 if( listCd[i].name == $('.v23_16').val()) {
@@ -128,6 +131,7 @@ $(document).ready(function(){
       </span>
 <input type="hidden" id="packageId" th:field="*{packageId}"></input>
 <input type="hidden" id="price" th:field="*{price}"></input>
+<input type="hidden" id="time" th:field="*{time}"></input>
 <input class="v23_14" placeholder="EMAIL*" th:field="*{email}" th:required="required"></input>
 <input class="v23_15" placeholder="SỐ ĐIỆN THOẠI*" th:field="*{phone}" th:required="required"></input>
 <input class="v23_18" placeholder="MACHINE ID" th:field="*{machineId}"></input>

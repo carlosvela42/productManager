@@ -30,6 +30,10 @@ public class Product {
 	private String errorMsg;
 	
 	private String machineId;
+	
+	private String status;
+	
+	private String time;
 
 	protected Product() {
 	}
@@ -153,6 +157,30 @@ public class Product {
 
 	public void setMachineId(String machineId) {
 		this.machineId = machineId;
+	}
+
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+
+	public String getTime() {
+		return time;
+	}
+
+
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 	

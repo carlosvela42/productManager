@@ -199,8 +199,13 @@ function setdefaultAll() {
 	paymentForm.elements["vaStartDt"].value = startDt + "000000";
 	paymentForm.elements["vaEndDt"].value = endDt + "235959";
 	paymentForm.elements["vaCondition"].value = "03";
-	paymentForm.elements["payType"].value = "IC";
-	paymentForm.elements["payOption"].value = "PAY_AND_CREATE_TOKEN";
+	if(product.time == '0'){
+		paymentForm.elements["payType"].value = "NO";
+	} else{
+		paymentForm.elements["payType"].value = "IC";
+		paymentForm.elements["payOption"].value = "PAY_AND_CREATE_TOKEN";
+	}
+		
 	paymentForm.elements["userId"].value = product.phone;
 	paymentForm.elements["callBackUrl"].value = "https://orderflow.com.vn/callback";
 	paymentForm.elements["notiUrl"].value = "https://orderflow.com.vn/ipn";

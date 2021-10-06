@@ -95,8 +95,8 @@ public class AppController {
 		} else {
 			service.insertMap(product);
 			service.updateUseCountCode(product.getCode());
-			//if("0".equals(product.getPrice())) {		    	
-		    if(true) {	
+			if("0".equals(product.getPrice())) {		    	
+		    //if(true) {	
 				product.setErrorMsg("0");				
 				service.insertPayment(product);
 				List<Packages> listPackages = service.listAllPackages();

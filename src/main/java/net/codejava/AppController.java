@@ -164,6 +164,24 @@ public class AppController {
 		return mav;		
 	}
 	
+	@RequestMapping(value = "/ipn")
+	public ModelAndView ipn(HttpServletRequest request) throws Exception {
+		String requestDecode = URLDecoder.decode(request.getQueryString(), "UTF-8");
+		Map<String, String> requestMap = getQueryMap(requestDecode);
+		String paymentLink = requestMap.get("paymentLink");
+		String link = "";
+		if(paymentLink != null) {
+			byte[] decoded = org.apache.commons.codec.binary.Base64.decodeBase64(paymentLink);
+			link = new String(decoded, "UTF-8");
+			service.updatePaymentLink(link, requestMap.get("vaNumber"), requestMap.get("invoiceNo"));
+		}
+		ModelAndView mav = new ModelAndView("success");
+		Product product = new Product();
+		product.setPaymentLink(link);
+		mav.addObject("product", product);
+		return mav;		
+	}
+	
 	public static Map<String, String> getQueryMap(String query) {  
 	    String[] params = query.split("&");  
 	    Map<String, String> map = new HashMap<String, String>();

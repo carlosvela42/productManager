@@ -5,8 +5,18 @@
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>Insert title here</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-
+<link rel="stylesheet" href="https://sandbox.megapay.vn:2810/pg_was/css/payment/layer/paymentClient.css" type="text/css" media="screen">
+<script type="text/javascript" src="https://sandbox.megapay.vn:2810/pg_was/js/payment/layer/paymentClient.js?v2"></script>
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	
+	    var product = /*[[${product}]]*/ 'default';
+	    
+	
+	/*]]>*/
+	</script>
 <script type="text/javascript">
+var paymentForm = document.getElementById('megapayForm');
 function encrypt(s){
     
     var chrsz   = 8;
@@ -149,29 +159,386 @@ $(document).ready(function(){
 		
 		var hash =  'EPAY000001VND' + $('#packageId').val() + $('#invoiceNo').val() + '' + "tung" + "rf8whwaejNhJiQG2bsFubSzccfRc/iRYyGUn6SPmT6y/L7A2XABbu9y4GvCoSTOTpvJykFi6b1G0crU8et2O0Q==";		
 		
-		window.location.href = "http://42.113.207.131:6996/CreateOrder?" + encodeURIComponent("merId=EPAY000001&currency=VND&amount=" 
+		/* window.location.href = "http://42.113.207.131:6996/CreateOrder?" + encodeURIComponent("merId=EPAY000001&currency=VND&amount=" 
 				+ $('#packageId').val() + "&invoiceNo=" + $('#invoiceNo').val() + "&goodsNm=" 
 				+ "tung" + "&payType=" + "" + "&payOption=" + ""
 				+ "&buyerFullName=" + "tung" + "&buyerPhone=" + $('#phone').val() + "&buyerEmail=" 
 				+ $('#email').val() + "&vaStartDt=" + vaStartDt + "&vaEndDt=" + orderDueDate + "&vaName=" + "tung" + "&customerId=" + $('#invoiceNo').val() + "&orderDueDt=" + orderDueDate 
 				+ "&vaCondition=" + "03" + "&buyerAddr=" + "Viet nam" + "&buyerCity=&buyerCountry=&callBackUrl=" + window.location.origin + "/callback&userLanguage=" + "VN" + "&hash=" 
-				+ encrypt(hash));
-	
-	
+				+ encrypt(hash)); */
+		setdefaultAll();				
+		payment();
 });
+
+function setdefaultAll() {
+	
+	var today = new Date();
+	var month;
+	var date;
+	if ( ( today.getMonth() + 1) < 10 )
+		month = "0" + ( today.getMonth() + 1).toString();
+	else
+		month = ( today.getMonth() + 1);
+	
+	if (today.getDate() < 10)
+		date = "0" + today.getDate().toString();
+	else
+		date = today.getDate().toString();
+	
+	var startDt = today.getFullYear().toString() + month + date;
+	var endDt = ( today.getFullYear() + 1 ).toString() + month + date;
+	paymentForm = document.getElementById('megapayForm');
+	paymentForm.elements["goodsAmount"].value = "10000";
+	paymentForm.elements["userFee"].value = "0";
+	paymentForm.elements["buyerLastNm"].value = "Doe";
+	paymentForm.elements["buyerFirstNm"].value = "John";
+	paymentForm.elements["buyerPhone"].value = product.phone;
+	paymentForm.elements["buyerEmail"].value = product.email;
+	paymentForm.elements["amount"].value = product.price;
+	paymentForm.elements["invoiceNo"].value = product.invoiceNo;
+	paymentForm.elements["vaStartDt"].value = startDt + "000000";
+	paymentForm.elements["vaEndDt"].value = endDt + "235959";
+	paymentForm.elements["vaCondition"].value = "03";
+	paymentForm.elements["payType"].value = "IC";
+	paymentForm.elements["payOption"].value = "PAY_AND_CREATE_TOKEN";
+	paymentForm.elements["userId"].value = product.phone;
+	paymentForm.elements["callBackUrl"].value = "https://orderflow.com.vn/callback";
+	paymentForm.elements["notiUrl"].value = "https://orderflow.com.vn/ipn";
+}
+
+function makeMerchantToken(type) {
+	if( type == 'payment' ) {
+		
+		paymentForm = document.getElementById('megapayForm');
+		paymentForm.elements["timeStamp"].value = new Date().getTime();
+		
+		if ( $("#otherId").val() != 'undefined' && $("#otherRadio").prop( 'checked' ) ) {
+			
+			$("input[type=radio][name=merId]:checked").val( $("#otherId").val() );
+		}
+		enKey = "rf8whwaejNhJiQG2bsFubSzccfRc/iRYyGUn6SPmT6y/L7A2XABbu9y4GvCoSTOTpvJykFi6b1G0crU8et2O0Q==";
+		
+		var time = new Date();
+		var merId = $("input[type=radio][name=merId]:checked").val();
+		var randomStr = makeRandomString();
+		var randomMertrxid = merId + time.getDate()
+							+ (time.getMonth() + 1)
+							+ time.getFullYear()
+							+ time.getHours()
+				           	+ time.getMinutes()
+						   	+ time.getSeconds()
+						   	+ randomStr;
+		paymentForm.elements["merTrxId"].value = randomMertrxid;
+		//
+		var createMerchantToken = paymentForm.elements["timeStamp"].value + paymentForm.elements["merTrxId"].value + $("input[type=radio][name=merId]:checked").val() + paymentForm.elements["amount"].value +paymentForm.elements["payToken"].value + enKey;
+		paymentForm.elements["merchantToken"].value = encrypt(createMerchantToken);
+		
+	}
+}
+
+function makeRandomString() {
+	  var text = "";
+	  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	  for (var i = 0; i < 6; i++)
+	    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+	  return text;
+}
+
+function makeCardTypeToken(){
+	var cardTypeValue = $("input[name='cardType']:checked").val();
+	if(cardTypeValue != ""){
+		var createCardTypeToken = cardTypeValue + paymentForm.elements["merTrxId"].value + enKey;
+		paymentForm.elements["cardTypeToken"].value = encrypt(createCardTypeToken);
+	}
+	
+}
+
+function payment() {	
+	makeMerchantToken('payment');
+	makeCardTypeToken();
+	openPayment(1,"https://sandbox.megapay.vn:2810");
+}
 
 </script>
 </head>
 <body>
-		<form action="#" th:action="@{/save}" th:object="${product}"
-			method="post">
-			<input type="hidden" th:field="*{email}" id="email" />
-			<input type="hidden" th:field="*{phone}" id="phone" />
-			<input type="hidden" th:field="*{packageId}" id="packageId" />
-			<input type="hidden" th:field="*{code}" id="code" />
-			<input type="hidden" th:field="*{invoiceNo}" id="invoiceNo" />
+	
+			
+		<div>
+			<form id ="megapayForm" name="megapayForm" method="POST">
+				<!-- <input type="hidden" name="payType" value="NO"> -->
+				<!-- <input type="hidden" name="invoiceNo" value="OrdNo"> -->
+				<input type="hidden" name="currency" value="VND">
+				<!-- <input type="hidden" name="instmntMon" value="1"> -->
+				<input type="hidden" name="instmntType" value="1">
+				<!-- 	<input type="hidden" name="cardNo" value="tttt">
+				<input type="hidden" name="domesticToken" value="tttt"> -->
+				<input style="width:95%" name="goodsNm" type="hidden" value="Cơm gà hoàng gia + Pepsi (S)" />
+				<!-- <input style="width:95%" name="buyerFirstNm" type="hidden" value="John"/>
+				<input style="width:95%" name="buyerLastNm" type="hidden" value="Doe"/> -->
+				<!-- <input style="width:95%" name="buyerPhone" type="hidden" value="090-123-4567" /> -->
+				<input style="width:95%" name="buyerAddr" type="hidden" value="hanoi"/>
+				<input style="width:95%" name="buyerCity" type="hidden" value="hanoi"/>
+				<input style="width:95%" name="buyerState" type="hidden" value="hanoi" />
+				<input style="width:95%" name="buyerPostCd" type="hidden" value="12950" />
+				<input style="width:95%" name="buyerCountry" type="hidden" value="VN" />
+				<input style="width:95%" name="fee" type="hidden" value="0" />
+				<input style="width:95%" name="vat" type="hidden" value="0" />
+				<input style="width:95%" name="notax" type="hidden" value="0" />
+				<!-- delivery Info -->
+				<input style="width:95%" name="receiverFirstNm" value="Tram" type="hidden">
+				<input style="width:95%" name="receiverLastNm" value="Ahn" type="hidden">
+				<input style="width:95%" name="receiverPhone" value="62-21-0000-0000" type="hidden">
+				<input style="width:95%" name="receiverAddr" value="hanoi" type="hidden">
+				<input style="width:95%" name="receiverCity" value="hanoi" type="hidden">
+				<input style="width:95%" name="receiverState" value="hanoi" type="hidden">
+				<input style="width:95%" name="receiverPostCd" value="12950" type="hidden">
+				<input style="width:95%" name="receiverCountry" value="VN" type="hidden">
+				<input style="width: 95%" name="description" value="payment" type="hidden">
+				<input style="width: 95%" maxlength="8" name="paymentExpDt" type="hidden">
+				<input style="width: 95%" maxlength="6" name="paymentExpTm" type="hidden">
+				<!-- 주문 결과를 받는 forward url입니다. -->
+				<!-- <input type="hidden" name="callBackUrl"  	 value="http://218.153.131.231:15010/vietnam_pg_was/api/finalResult.jsp"> -->
+				<input type="hidden" name="callBackUrl"  	 value="<%=domain%>/pg_was/new/sampleMerchant.do">
+				<!-- 주문 결과를 받는 DB연결 url입니다. -->
+				<input type="hidden" name="notiUrl" 	 value="http://172.16.114.19:2711/pg_proxy/api/notiProxyTest.do">
+				
+				<!-- 상점도메인. -->
+				<input type="hidden" name="reqDomain" value="<%=domain%>/pg_was/test/samplePage.do">
+				<!-- 상점 서버 아이피  -->
+				<input type="hidden" name="reqServerIP"	value="127.0.0.1">
+				<!-- TX 버전. -->
+				<input type="hidden" name="reqClientVer" value="">
+				<!-- 사용자 아이피 -->
+				<input type="hidden" name="userIP" value="192.168.220.1">
+				<!-- 주문 결과를 받는 DB연결 url입니다. -->
+				<input type="hidden" name="userSessionID" value="127.0.0.1">
+				<!-- 사용자 브라우저 정보 -->
+				<input type="hidden" name="userAgent" value="chrome">
+				<!-- 사용자 언어 -->
+				
+				<!-- Sign 데이터 -->
+				<input type="hidden" name="merchantToken" value="">
+				<input type="hidden" name="cardTypeToken" value="">
+				<!-- merchantToken을 만드는 재료 중 하나 -->
+				<!-- <input type="hidden" name="encodeKey" value="VpwJq+ijKLTvmECeqVMqchnP/Tlx68c138Fv5cEkinj/HmMC0iTkcLjTGpuYUFdU4F1wt6rKo21zpahpJ/BJmw=="> -->
+				<!-- <input type="hidden" name="encodeKey" value="rf8whwaejNhJiQG2bsFubSzccfRc/iRYyGUn6SPmT6y/L7A2XABbu9y4GvCoSTOTpvJykFi6b1G0crU8et2O0Q=="> -->
+				<!-- 결제방법  -->
+				<input type="hidden" name="payForm" value="PAY">
+				<!-- isDirestPay  -->
+				<input type="hidden" name="version">
+				<!-- timeStamp  -->
+				<input type="hidden" name="timeStamp" value="">
+				
+				<!-- merchant temp field1  -->
+				<input type="hidden" name="mer_temp01" value="temp">
+				<!-- merchant temp field2  -->
+				<input type="hidden" name="mer_temp02">
+				<!-- pg temp field1  -->
+				<input type="hidden" name="pg_temp01">
+				<!-- pg temp field2  -->
+				<input type="hidden" name="pg_temp02">
+				<!-- merTrxId  -->
+				<input type="hidden" name="merTrxId" value="testMerchantTransaction" >
+				
+				<input type="hidden" name="domesticToken">
+				<!-- <input type="hidden" name="windowType" value=""> -->
+				
+				<!--input type="hidden" name="payOption" value="PAY_WITH_TOKEN"/-->
+				<!--input type="hidden" name="payOption" value="PAY_AND_CREATE_TOKEN"/-->
+				<input type ="hidden" name="cancelUrl" value="">
+				<!-- PURCHASE_OTP -->
+				<!--PAY_WITH_RETURNED_TOKEN -->
+				<!-- <input type="hidden" name="payOption" value="PAY_WITH_RETURNED_TOKEN"/> -->
+
+				<!-- VISA -->
+				<!-- <input type="hidden" name="payToken" id="payToken" value="c72b110b7b98926ec5adc025cd30b9b11bccc2db87ac7ddaa5cb38af5d2b9b1ea3bcc09245bd088b"/> --> 
+				<!-- ATM -->
+				<!-- <input type="hidden" name="payToken" id="payToken" value="8fde321621a4f9bc0389f3874be21a913c5e348c10a3358f52f2b0868e78af3aa3bcc09245bd088b"/> --> 
+				
+				<!-- <input type="hidden" name="payToken" id="" value=""/> -->
+				<input type="hidden" name="userId" value="hnluanbv123">
+                <input type ="hidden" name="discountCode" value="">
+                <input type ="hidden" name="payCode" value="">                
+			    <div class="row">
+			    
+			    <table>
+			    
+			    <tr>
+				    <td>MerchantID</td>
+	    			<td colspan="2">
+	    				<input type='radio' id='no' name='merId' value='EPAY000001' checked="checked"/>EPAY000001
+		                <input type='radio' id='domestic' name='merId' value='EPAY000002'/>EPAY000002
+		                <input type='radio' id='otherRadio' name='merId' value=''/>
+		                <input type='text' id='otherId' value='' placeholder="Other ID : ex) SITNAPAS01" onClick="checkOtherMerchant()"/>
+		            </td>
+	            </tr>
+	            
+	            <tr>
+	            	<td>Installment Monthly</td>
+	            	<td colspan="2">
+	            		<select name="instmntMon" id="instmntMon">
+	                	<option value="1"> Pay in full </option>
+   		                <option value="3"> 3 </option>
+   		                <option value="6"> 6 </option>
+   		                <option value="9"> 9 </option>
+   		                <option value="12"> 12 </option>
+   		                <option value="15"> 15 </option>
+   		                <option value="18"> 18 </option>
+   		                <option value="21"> 21 </option>
+   		                <option value="24"> 24 </option>
+ 				 	</select>
+	            	</td>
+	            </tr>
+	            
+	            <tr>
+	            	<td>PayType</td>
+	            	<td colspan="2">
+	            		<input type='radio' id='no' name='payType' value='NO' checked="checked"/>NO PEYMENT METHOD
+		                <input type='radio' id='domestic' name='payType' value='DC'/>DOMESTIC
+		                <input type='radio' id='international' name='payType' value='IC'/>INTERNATIONAL
+		                <input type='radio' id='virtual' name='payType' value='VA'/>DEDICATED ACCOUNT
+		                <input type='radio' id='ew' name='payType' value='EW'/>ZALOPAY
+		                <input type='radio' id='is' name='payType' value='IS'/>Trả góp
+		                <input type='radio' id='ew1' name='payType' value='EW1'/>MOMO
+		                <input type='radio' id='ew1' name='payType' value='EW2'/>
+	            	</td>
+	            </tr>
+	            <tr class="trCardType">
+	            	<td>CardType</td>
+	            	<td colspan="2">
+	            		<input type='radio' id='defaultCard' name='cardType' value='' checked="checked"/>DEFAULT
+	            		<input type='radio' id='masterCard' name='cardType' value='mastercard'/>MASTERCARD
+		                <input type='radio' id='visa' name='cardType' value='visa'/>VISA
+		                <input type='radio' id='jcb' name='cardType' value='jcb'/>JCB           
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td>Payment Window Color</td>
+	            	<td colspan="2">
+	            		<input type='radio' id='default' name='windowColor' value='' checked="checked"/>Default
+		                <input type='radio' id='blue' name='windowColor' value='#ADAFF7'/>Blue
+		                <input type='radio' id='green' name='windowColor' value='#13bc57'/>Green
+		                <input type='radio' id='yellow' name='windowColor' value='#E2E476'/>Yellow
+		                <input type='radio' id='purple' name='windowColor' value='#D386ED'/>Purple
+		                <input type='radio' id='blackBlue' name='windowColor' value='#000a89'/>Black blue
+	            	</td>
+	            </tr>
+	            
+	            <tr>
+	            	<td>Amount</td>
+	            	<td colspan="2">
+		            	<input type="text" name="amount" placeholder="Total Amount : ex) 10000" required>
+			            <input type="text" name="goodsAmount" value="" placeholder="Goods Amount : ex) 9000" required>
+						<input type="text" name="userFee" value="" placeholder="User Fee : ex) 1000" required>
+						<input type = "button" value = "default" onclick="setAmount();">
+	            	</td>
+	            </tr>
+	            
+	            <tr>
+	            	<td>buyer Name</td>
+	            	<td colspan="2">
+		            	<input name="buyerLastNm" type="text" value="" placeholder="LastName" required/>
+		            	<input name="buyerFirstNm" type="text" value="" placeholder="FirstName" required/>
+		            	<input name="bankCode" type="text" value="" placeholder="bankCode" required/>
+		            	<input type = "button" value = "default" onclick="setName();">
+	            	</td>
+	            </tr>
+	            
+	            <tr>
+	            	<td>buyer E-mail</td>
+	            	<td>
+	            		 <input id="buyerEmail" name="buyerEmail" type="text" size="64" maxLength="64"
+			          placeholder="example@example.com"
+			          title="Please provide email address">
+			          <input type = "button" value = "default" onclick="setEmail();">
+	            	</td>
+	            	<td>	            		 
+	            		 <input id="buyerPhone" name="buyerPhone" type="text" />
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td>VA Start/End Date</td>
+	            	<td colspan="2">
+		            	<input name="vaStartDt" type="text" value="" placeholder="ex)20190117000000" required/>
+		            	<input name="vaEndDt" type="text" value="" placeholder="ex)20190617235959" required/>
+		            	<input type = "button" value = "default" onclick="setDate();">
+	            	</td>
+	            </tr>
+	            <tr>
+            		<td>VA Condition</td>
+       				<td>
+		            	<input name="vaCondition" type="text" value="" placeholder="ex)refer to description" required/>
+		            	<input type = "button" value = "default" onclick="setCondition();">
+	            	</td>
+	            	<td>
+	            		condition description
+		            	<br>01 : no condition / 02 : request amount >= “amount”
+		            	<br>03 : request amount == “amount” / 04 : request amount <= “amount”
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td>Window type</td>
+	            	<td colspan="2">
+	            		<select name="windowType" id="windowType">
+	                	<option value="" selected> PC </option>
+   		                <option value="1"  > Mobile </option>
+   		             
+ 				 	</select>
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td>Pay option</td>
+	            	<td colspan="2">
+	            		<select name="payOption" id="payOption">
+		                	<option value="PAY_WITH_RETURNED_TOKEN" selected>DC PAY_WITH_RETURNED_TOKEN </option>
+	   		                <option value="PURCHASE_OTP">DC PURCHASE_OTP </option>
+	   		                <option value="PAY_CREATE_TOKEN" selected>PAY_CREATE_TOKEN  </option>
+	   		                <option value="PAY_WITH_TOKEN">PAY_WITH_TOKEN </option>
+	   		                <option value="PAY_AND_CREATE_TOKEN">IC PAY_AND_CREATE_TOKEN </option>
+	   		                <option value="" selected>Để trống</option>
+	   		            </select>    
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td>Pay token</td>
+	            	<td colspan="2"><input name="payToken" id="" value=""/></td>
+	            </tr>
+	            <tr>
+	            	<td>Card RC</td>
+	            	<td colspan="2"><input name="cardNoRc" id="" value=""/></td>
+	            </tr>	
+	            <tr>
+	            	<td>subappid</td>
+	            	<td colspan="2"><input name="subappid" id="" value=""/></td>
+	            </tr>
+	            <tr>
+	            	<td>userLanguage</td>
+	            	<td colspan="2"><input name="userLanguage" value="vn"></td>
+	            </tr>	            
+	            <tr>
+	            	<td>invoice_no</td>
+	            	<td colspan="2"><input name="invoiceNo"></td>
+	            </tr>	            
+			    </table>
+			    
+		            <!-- <div class="left-form">
+		            	<div class="label-row">
+		                    <label for="domesticToken">DomesticToken </label>
+		               	</div>
+		                <input type="text" name="domesticToken" value="" required>
+		            </div>
+		            <div class="right-form">
+		                <div class="label-row">
+		                    <label for="userId">UserId </label>
+		                </div>
+		                <input type="text" name="userId" value="" required>
+		            </div> -->
+		        </div>
 			</form>
 			
-				
+		</div>		
 </body>
 </html>

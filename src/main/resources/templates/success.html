@@ -9,7 +9,12 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
 $(document).ready(function(){	
- $(".alert").html("Thanh toán thành công, vui lòng ấn vào link dưới để quay lại trang sản phẩm!<br/><a href='" + "https://orderflow.com.vn/" + "'>Link</a>");
+	if('SUCCESS' == $('#errorMsg').val()){
+		$(".alert").html("Thanh toán thành công, vui lòng ấn vào link dưới để quay lại trang sản phẩm!<br/><a href='" + "https://orderflow.com.vn/" + "'>Link</a>");
+	} else{
+		$(".alert").html("Thanh toán thât bại, mã lỗi " + $('#errorMsg').val() + ", vui lòng ấn vào link dưới để quay lại trang sản phẩm!<br/><a href='" + "https://orderflow.com.vn/" + "'>Link</a>");
+	}
+	
 	
 });
 </script>
@@ -19,7 +24,7 @@ $(document).ready(function(){
   
 <form action="#" th:action="@{/save}" th:object="${product}"
 			method="post">
-			<input type="hidden" th:field="*{paymentLink}" id="paymentLink" />
+			<input type="hidden" th:field="*{errorMsg}" id="errorMsg" />
 			
 			</form>
 </div>

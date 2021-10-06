@@ -150,16 +150,22 @@ public class AppController {
 	public ModelAndView callback(HttpServletRequest request) throws Exception {
 		String requestDecode = URLDecoder.decode(request.getQueryString(), "UTF-8");
 		Map<String, String> requestMap = getQueryMap(requestDecode);
-		String paymentLink = requestMap.get("paymentLink");
+		String payToken = requestMap.get("payToken");
+		String merTrxId = requestMap.get("merTrxId");
+		String trxId = requestMap.get("trxId");
+		String userId = requestMap.get("userId");
+		String resultMsg = requestMap.get("resultMsg");
+		String resultCd = requestMap.get("resultCd");
+		String amount = requestMap.get("amount");
+		String merchantToken = requestMap.get("merchantToken");
+		String invoiceNo = requestMap.get("invoiceNo");
+		String cardNo = requestMap.get("cardNo");
 		String link = "";
-		if(paymentLink != null) {
-			byte[] decoded = org.apache.commons.codec.binary.Base64.decodeBase64(paymentLink);
-			link = new String(decoded, "UTF-8");
-			service.updatePaymentLink(link, requestMap.get("vaNumber"), requestMap.get("invoiceNo"));
-		}
+		service.updatePaymentLink(payToken, trxId, requestMap.get("invoiceNo"));
 		ModelAndView mav = new ModelAndView("success");
 		Product product = new Product();
 		product.setPaymentLink(link);
+		product.setErrorMsg(resultMsg);
 		mav.addObject("product", product);
 		return mav;		
 	}
@@ -168,16 +174,22 @@ public class AppController {
 	public ModelAndView ipn(HttpServletRequest request) throws Exception {
 		String requestDecode = URLDecoder.decode(request.getQueryString(), "UTF-8");
 		Map<String, String> requestMap = getQueryMap(requestDecode);
-		String paymentLink = requestMap.get("paymentLink");
+		String payToken = requestMap.get("payToken");
+		String merTrxId = requestMap.get("merTrxId");
+		String trxId = requestMap.get("trxId");
+		String userId = requestMap.get("userId");
+		String resultMsg = requestMap.get("resultMsg");
+		String resultCd = requestMap.get("resultCd");
+		String amount = requestMap.get("amount");
+		String merchantToken = requestMap.get("merchantToken");
+		String invoiceNo = requestMap.get("invoiceNo");
+		String cardNo = requestMap.get("cardNo");
 		String link = "";
-		if(paymentLink != null) {
-			byte[] decoded = org.apache.commons.codec.binary.Base64.decodeBase64(paymentLink);
-			link = new String(decoded, "UTF-8");
-			service.updatePaymentLink(link, requestMap.get("vaNumber"), requestMap.get("invoiceNo"));
-		}
+		service.updatePaymentLink(payToken, trxId, requestMap.get("invoiceNo"));
 		ModelAndView mav = new ModelAndView("success");
 		Product product = new Product();
 		product.setPaymentLink(link);
+		product.setErrorMsg(resultMsg);
 		mav.addObject("product", product);
 		return mav;		
 	}

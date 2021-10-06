@@ -115,7 +115,7 @@ public class ProductService {
 	}
 	
 	public void updatePaymentLink(String paymentLink, String vaNumber, String invoiceNo) {
-		String sql = "update PRODUCT set PAYMENT_LINK = ?, VA_NUMBER = ? WHERE INVOICE_NO = ?";
+		String sql = "update PAYMENT set PAYMENT_LINK = ?, VA_NUMBER = ? WHERE INVOICE_NO = ?";
 		Connection con = null;
 		PreparedStatement pstm = null;
 		ResultSet rs = null;

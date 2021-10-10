@@ -5,8 +5,8 @@
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>Insert title here</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<link rel="stylesheet" href="https://sandbox.megapay.vn:2810/pg_was/css/payment/layer/paymentClient.css" type="text/css" media="screen">
-<script type="text/javascript" src="https://sandbox.megapay.vn:2810/pg_was/js/payment/layer/paymentClient.js?v2"></script>
+<link rel="stylesheet" href=" https://pg.megapay.vn/pg_was/css/payment/layer/paymentClient.css" type="text/css" media="screen">
+<script type="text/javascript" src=" https://pg.megapay.vn/pg_was/js/payment/layer/paymentClient.js?v2"></script>
 <script th:inline="javascript">
 	/*<![CDATA[*/
 	
@@ -188,6 +188,7 @@ function setdefaultAll() {
 	var startDt = today.getFullYear().toString() + month + date;
 	var endDt = ( today.getFullYear() + 1 ).toString() + month + date;
 	paymentForm = document.getElementById('megapayForm');
+	
 	paymentForm.elements["goodsAmount"].value = "10000";
 	paymentForm.elements["userFee"].value = "0";
 	paymentForm.elements["buyerLastNm"].value = "Doe";
@@ -201,9 +202,11 @@ function setdefaultAll() {
 	paymentForm.elements["vaCondition"].value = "03";
 	if(product.time == '0'){
 		paymentForm.elements["payType"].value = "NO";
+		paymentForm.elements["merId"].value = "ORDERFLOW2";
 	} else{
 		paymentForm.elements["payType"].value = "IC";
 		paymentForm.elements["payOption"].value = "PAY_AND_CREATE_TOKEN";
+		paymentForm.elements["merId"].value = "ORDERFLOW1";
 	}
 		
 	paymentForm.elements["userId"].value = product.phone;
@@ -217,14 +220,15 @@ function makeMerchantToken(type) {
 		paymentForm = document.getElementById('megapayForm');
 		paymentForm.elements["timeStamp"].value = new Date().getTime();
 		
-		if ( $("#otherId").val() != 'undefined' && $("#otherRadio").prop( 'checked' ) ) {
-			
-			$("input[type=radio][name=merId]:checked").val( $("#otherId").val() );
+		if(product.time == '0'){
+			enKey = "B9NmWS0lxV3AmgcbBmRWJ2maT3ew8S3en2MTxz4/TSRM0mDlHwUvjckYkGLI+yVgJfNx9/PxcARhFJQO+Wsd0w==";
+		}else{
+			enKey = "qxVTXsZIpyWu5FEm7Asmk6i+Pr8aeiMCxpb1KOyE1a94P1MBnFtgkJgxYLaxDoOgwdcVW1TG+cDLT5koJbjYqA==";
 		}
-		enKey = "rf8whwaejNhJiQG2bsFubSzccfRc/iRYyGUn6SPmT6y/L7A2XABbu9y4GvCoSTOTpvJykFi6b1G0crU8et2O0Q==";
+		
 		
 		var time = new Date();
-		var merId = $("input[type=radio][name=merId]:checked").val();
+		var merId = paymentForm.elements["merId"].value;
 		var randomStr = makeRandomString();
 		var randomMertrxid = merId + time.getDate()
 							+ (time.getMonth() + 1)
@@ -235,7 +239,7 @@ function makeMerchantToken(type) {
 						   	+ randomStr;
 		paymentForm.elements["merTrxId"].value = randomMertrxid;
 		//
-		var createMerchantToken = paymentForm.elements["timeStamp"].value + paymentForm.elements["merTrxId"].value + $("input[type=radio][name=merId]:checked").val() + paymentForm.elements["amount"].value +paymentForm.elements["payToken"].value + enKey;
+		var createMerchantToken = paymentForm.elements["timeStamp"].value + paymentForm.elements["merTrxId"].value + merId + paymentForm.elements["amount"].value +paymentForm.elements["payToken"].value + enKey;
 		paymentForm.elements["merchantToken"].value = encrypt(createMerchantToken);
 		
 	}
@@ -263,7 +267,7 @@ function makeCardTypeToken(){
 function payment() {	
 	makeMerchantToken('payment');
 	makeCardTypeToken();
-	openPayment(1,"https://sandbox.megapay.vn:2810");
+	openPayment(1," https://pg.megapay.vn");
 }
 
 </script>
@@ -374,10 +378,8 @@ function payment() {
 			    <tr>
 				    <td>MerchantID</td>
 	    			<td colspan="2">
-	    				<input type='radio' id='no' name='merId' value='EPAY000001' checked="checked"/>EPAY000001
-		                <input type='radio' id='domestic' name='merId' value='EPAY000002'/>EPAY000002
-		                <input type='radio' id='otherRadio' name='merId' value=''/>
-		                <input type='text' id='otherId' value='' placeholder="Other ID : ex) SITNAPAS01" onClick="checkOtherMerchant()"/>
+	    				<input id='merId' name='merId' />
+		                
 		            </td>
 	            </tr>
 	            

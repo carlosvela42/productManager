@@ -1,6 +1,8 @@
 package net.codejava;
 
 import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -150,42 +152,48 @@ public class AppController {
 	public ModelAndView callback(HttpServletRequest request) throws Exception {
 		String requestDecode = URLDecoder.decode(request.getQueryString(), "UTF-8");
 		Map<String, String> requestMap = getQueryMap(requestDecode);
-		String payToken = requestMap.get("payToken");
-		String merTrxId = requestMap.get("merTrxId");
-		String trxId = requestMap.get("trxId");
-		String userId = requestMap.get("userId");
 		String resultMsg = requestMap.get("resultMsg");
-		String resultCd = requestMap.get("resultCd");
-		String amount = requestMap.get("amount");
 		String merchantToken = requestMap.get("merchantToken");
-		String invoiceNo = requestMap.get("invoiceNo");
-		String cardNo = requestMap.get("cardNo");
-		String link = "";
-		service.updatePaymentLink(payToken, trxId, requestMap.get("invoiceNo"));
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(requestMap.get("resultCd"));
+		stringBuilder.append(requestMap.get("timeStamp"));
+		stringBuilder.append(requestMap.get("merTrxId"));
+		stringBuilder.append(requestMap.get("trxId"));
+		stringBuilder.append(requestMap.get("merId"));
+		stringBuilder.append(requestMap.get("amount"));
+		
+		if("ORDERFLOW2".equals(requestMap.get("merId"))){
+			stringBuilder.append("B9NmWS0lxV3AmgcbBmRWJ2maT3ew8S3en2MTxz4/TSRM0mDlHwUvjckYkGLI+yVgJfNx9/PxcARhFJQO+Wsd0w==");
+		}else{
+			stringBuilder.append(requestMap.get("payToken"));
+			stringBuilder.append("qxVTXsZIpyWu5FEm7Asmk6i+Pr8aeiMCxpb1KOyE1a94P1MBnFtgkJgxYLaxDoOgwdcVW1TG+cDLT5koJbjYqA==");
+		}
+
+		String result = encrypt(stringBuilder.toString());
+				
 		ModelAndView mav = new ModelAndView("success");
 		Product product = new Product();
-		product.setPaymentLink(link);
+		product.setPaymentLink("");
 		product.setErrorMsg(resultMsg);
+		if (result.equals(merchantToken)) {
+			service.updatePayment(requestMap.get("payToken"), requestMap.get("merTrxId"), requestMap.get("trxId"), requestMap.get("resultCd"), requestMap.get("invoiceNo"));
+		} else {
+			product.setErrorMsg("Merchant token không khớp");
+		}
+		
 		mav.addObject("product", product);
 		return mav;		
 	}
 	
 	@RequestMapping(value = "/ipn")
 	public ModelAndView ipn(HttpServletRequest request) throws Exception {
+		//tuong lai code
 		String requestDecode = URLDecoder.decode(request.getQueryString(), "UTF-8");
 		Map<String, String> requestMap = getQueryMap(requestDecode);
-		String payToken = requestMap.get("payToken");
-		String merTrxId = requestMap.get("merTrxId");
-		String trxId = requestMap.get("trxId");
-		String userId = requestMap.get("userId");
 		String resultMsg = requestMap.get("resultMsg");
-		String resultCd = requestMap.get("resultCd");
-		String amount = requestMap.get("amount");
-		String merchantToken = requestMap.get("merchantToken");
-		String invoiceNo = requestMap.get("invoiceNo");
-		String cardNo = requestMap.get("cardNo");
 		String link = "";
-		service.updatePaymentLink(payToken, trxId, requestMap.get("invoiceNo"));
+		
 		ModelAndView mav = new ModelAndView("success");
 		Product product = new Product();
 		product.setPaymentLink(link);
@@ -208,5 +216,24 @@ public class AppController {
 	        map.put(name, value);  
 	    }  
 	    return map;  
+	}
+	
+	public static String encrypt(String str){
+		String SHA = ""; 
+		try{
+			MessageDigest sh = MessageDigest.getInstance("SHA-256"); 
+			sh.update(str.getBytes()); 
+			byte byteData[] = sh.digest();
+			StringBuffer sb = new StringBuffer(); 
+			for(int i = 0 ; i < byteData.length ; i++){
+				sb.append(Integer.toString((byteData[i]&0xff) + 0x100, 16).substring(1));
+			}
+			SHA = sb.toString();
+			
+		}catch(NoSuchAlgorithmException e){
+			e.printStackTrace(); 
+			SHA = null; 
+		}
+		return SHA;
 	}
 }

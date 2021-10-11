@@ -135,6 +135,30 @@ public class ProductService {
 		}
 	}
 	
+	public void updatePayment(String payToken, String merTrxId, String trxId, String resultCd, String invoiceNo) {
+		String sql = "update PAYMENT set PAY_TOKEN = ?, MER_TRX_ID = ?, TRX_ID = ?, RESULT_CD = ?, STATUS = ? WHERE INVOICE_NO = ?";
+		Connection con = null;
+		PreparedStatement pstm = null;
+		ResultSet rs = null;
+		
+		try {
+			con = JdbcTemplate.getDataSource().getConnection();
+			pstm = con.prepareStatement(sql);
+			pstm.setString(1, payToken);
+			pstm.setString(2, merTrxId);
+			pstm.setString(3, trxId);
+			pstm.setString(4, resultCd);
+			pstm.setString(5, "00_000".equals(resultCd) ? "2" : "0");
+			pstm.setString(6, invoiceNo);
+			int updateCount = pstm.executeUpdate();	
+			System.out.print(updateCount);
+		} catch (Exception e) {
+			System.out.print(e);
+		} finally {
+			closeResource(con, pstm, rs);
+		}
+	}
+	
 	private void closeResource(Connection con, PreparedStatement pstm, ResultSet rs) {
 		try {
 			if (con != null) {

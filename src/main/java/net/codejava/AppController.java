@@ -126,6 +126,13 @@ public class AppController {
 				return mav;
 			} else {
 				service.insertPayment(product);
+                List<Packages> listPackages = service.listAllPackages();
+                
+                for (Packages element : listPackages) {                    
+                    if(product.getPackageId().equals(element.getId() + "")) {
+                        service.sendEmail(element.getTemplate(), element.getSubject(), product.getEmail());
+                    }
+                }
 				ModelAndView mav = new ModelAndView("payment");
 				mav.addObject("product", product);
 				return mav;
